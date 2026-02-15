@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para William 💗</title>
+    <style>
+        body { margin: 0; padding: 0; background-color: #000; color: white; font-family: 'Arial', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        
+        #inicio { text-align: center; z-index: 100; transition: opacity 0.8s; }
+        .nombre { font-size: 50px; font-weight: bold; margin-bottom: 20px; letter-spacing: 3px; }
+        .btn { background: #fff; color: #000; border: none; padding: 15px 40px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 18px; box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
+
+        #letras { position: absolute; text-align: center; width: 85%; font-size: 26px; font-weight: bold; text-shadow: 0 0 10px rgba(255,255,255,0.5); z-index: 50; line-height: 1.5; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
+
+        #contenedor-foto { display: none; opacity: 0; transform: scale(0.5); transition: all 2s ease-out; z-index: 60; text-align: center; }
+        .foto-william { width: 280px; height: 350px; border-radius: 20px; border: 5px solid white; object-fit: cover; box-shadow: 0 0 30px rgba(255,255,255,0.3); }
+        .mensaje-final { margin-top: 20px; font-size: 24px; font-weight: bold; color: #32CD32; }
+
+        canvas { position: absolute; top: 0; left: 0; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <div id="inicio">
+        <div class="nombre">WILLIAM 💗</div>
+        <button class="btn" onclick="comenzar()">CLICK AQUÍ</button>
+    </div>
+
+    <div id="letras"></div>
+
+    <div id="contenedor-foto">
+        <img src="foto_william.jpg" alt="William" class="foto-william">
+        <div class="mensaje-final">Happy Valentine's Day! 💗</div>
+    </div>
+
+    <canvas id="canvasCorazones"></canvas>
+    <audio id="musica" src="musica.mp3"></audio>
+
+    <script>
+        const frases = [
+            { t: 2, texto: "Te siento al cantar y al escuchar cualquier canción" },
+            { t: 7, texto: "Bonita que hable del amor, de lo que siento ayer y hoy" },
+            { t: 13, texto: "Siempre te llevo al despertar" },
+            // Agregamos tu frase especial al final de la canción
+            { t: 18, texto: "Te quiero mi niño bonito, gracias por hacer feliz mi vida. 💗" }
+        ];
+
+        function comenzar() {
+            const audio = document.getElementById('musica');
+            const inicio = document.getElementById('inicio');
+            const letrasDiv = document.getElementById('letras');
+            const fotoDiv = document.getElementById('contenedor-foto');
+
+            inicio.style.opacity = '0';
+            setTimeout(() => inicio.style.display = 'none', 800);
+            
+            audio.play();
+            iniciarCorazones();
+
+            frases.forEach((linea, index) => {
+                setTimeout(() => {
+                    letrasDiv.style.opacity = '0'; 
+                    setTimeout(() => {
+                        letrasDiv.innerHTML = linea.texto;
+                        letrasDiv.style.opacity = '1';
+                    }, 500);
+                    
+                    // Al terminar la última frase (tu dedicatoria), se muestra la foto
+                    if (index === frases.length - 1) {
+                        setTimeout(() => {
+                            letrasDiv.style.opacity = '0';
+                            setTimeout(() => {
+                                letrasDiv.style.display = 'none';
+                                mostrarFoto(fotoDiv);
+                            }, 1500);
+                        }, 5000); // Tiempo para leer la frase final
+                    }
+                }, linea.t * 1000);
+            });
+        }
+
+        function mostrarFoto(div) {
+            div.style.display = 'block';
+            setTimeout(() => {
+                div.style.opacity = '1';
+                div.style.transform = 'scale(1)';
+            }, 100);
+        }
+
+        function iniciarCorazones() {
+            const canvas = document.getElementById('canvasCorazones');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let partículas = [];
+            const colores = ['#32CD32', '#FFEB3B', '#00BFFF']; 
+
+            class Corazon {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = canvas.height + 20;
+                    this.size = Math.random() * 15 + 10;
+                    this.speed = Math.random() * 2 + 1;
+                    this.color = colores[Math.floor(Math.random() * colores.length)];
+                }
+                dibujar() {
+                    ctx.save();
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    const topCurveHeight = this.size * 0.3;
+                    ctx.moveTo(this.x, this.y + topCurveHeight);
+                    ctx.bezierCurveTo(this.x, this.y, this.x - this.size / 2, this.y, this.x - this.size / 2, this.y + topCurveHeight);
+                    ctx.bezierCurveTo(this.x - this.size / 2, this.y + (this.size + topCurveHeight) / 2, this.x, this.y + (this.size + topCurveHeight) / 2, this.x, this.y + this.size);
+                    ctx.bezierCurveTo(this.x, this.y + (this.size + topCurveHeight) / 2, this.x + this.size / 2, this.y + (this.size + topCurveHeight) / 2, this.x + this.size / 2, this.y + topCurveHeight);
+                    ctx.bezierCurveTo(this.x + this.size / 2, this.y, this.x, this.y, this.x, this.y + topCurveHeight);
+                    ctx.fill();
+                    ctx.restore();
+                }
+                update() {
+                    this.y -= this.speed;
+                    this.x += Math.sin(this.y / 50) * 0.5;
+                }
+            }
+
+            function animar() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (partículas.length < 50 && Math.random() < 0.1) partículas.push(new Corazon());
+                partículas.forEach((p, i) => {
+                    p.update();
+                    p.dibujar();
+                    if (p.y < -50) partículas.splice(i, 1);
+                });
+                requestAnimationFrame(animar);
+            }
+            animar();
+        }
+    </script>
+</body>
+</html>
